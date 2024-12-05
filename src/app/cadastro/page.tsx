@@ -113,23 +113,6 @@ export default function CadastroMovimentacao() {
 
         {formData.tipo.startsWith('despesa') && (
           <div>
-          <label htmlFor="dataPagamento" className="block mb-2 font-semibold">
-            Data de Pagamento
-          </label>
-          <input
-            type="date"
-            id="data"
-            name="data"
-            value={formData.data}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-          />
-        </div>
-          )}
-
-        {formData.tipo.startsWith('despesa') && (
-          <div>
             <label htmlFor="situacao" className="block mb-2 font-semibold">
               Situação
             </label>
