@@ -61,7 +61,7 @@ export default function CadastroMovimentacao() {
           descricao: formData.descricao,
           valor: valorNumerico,
           data: formData.data,
-          situacao: formData.tipo.startsWith('despesa') ? formData.situacao : '',
+          situacao: formData.tipo.startsWith('despesa') ? formData.situacao : 'recebido',
         });
 
         alert('Movimentação cadastrada com sucesso!');
