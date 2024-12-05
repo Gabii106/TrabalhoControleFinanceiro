@@ -1,10 +1,13 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { db } from '../../../firebase';
+import { collection, addDoc } from 'firebase/firestore';
+import dayjs from 'dayjs'; // Biblioteca para manipulação de datas
 
 export default function CadastroMovimentacao() {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     tipo: 'receita',
     descricao: '',
@@ -12,20 +15,64 @@ export default function CadastroMovimentacao() {
     data: '',
     mesesFixos: '1',
     situacao: 'pago',
-  })
+  });
 
+  // Atualiza os valores do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically send the data to your backend
-    console.log(formData)
-    // Redirect to the dashboard after submission
-    router.push('/')
-  }
+  // Lida com o envio do formulário
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Validação básica
+    if (!formData.descricao || !formData.valor || !formData.data) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    try {
+      const movimentosRef = collection(db, 'movimentos');
+      const valorNumerico = parseFloat(formData.valor);
+
+      // Se for despesa fixa, cria múltiplos documentos
+      if (formData.tipo === 'despesa_fixa') {
+        const meses = parseInt(formData.mesesFixos, 10);
+        const dataInicial = dayjs(formData.data);
+
+        for (let i = 0; i < meses; i++) {
+          const dataAtual = dataInicial.add(i, 'month').format('YYYY-MM-DD');
+          await addDoc(movimentosRef, {
+            tipo: formData.tipo,
+            descricao: formData.descricao,
+            valor: valorNumerico,
+            data: dataAtual,
+            situacao: formData.situacao,
+          });
+        }
+
+        alert(`Despesa fixa cadastrada para ${meses} meses!`);
+      } else {
+        // Para outros tipos, insere um único documento
+        await addDoc(movimentosRef, {
+          tipo: formData.tipo,
+          descricao: formData.descricao,
+          valor: valorNumerico,
+          data: formData.data,
+          situacao: formData.tipo.startsWith('despesa') ? formData.situacao : '',
+        });
+
+        alert('Movimentação cadastrada com sucesso!');
+      }
+
+      router.push('/'); // Redireciona para a página inicial
+    } catch (error) {
+      console.error('Erro ao cadastrar movimentação:', error);
+      alert('Erro ao cadastrar movimentação. Tente novamente.');
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -48,7 +95,7 @@ export default function CadastroMovimentacao() {
           </select>
         </div>
 
-        {formData.tipo.startsWith('despesa_fixa') && (
+        {formData.tipo === 'despesa_fixa' && (
           <div>
             <label htmlFor="mesesFixos" className="block mb-2 font-semibold">
               Meses (para despesas fixas)
@@ -137,6 +184,5 @@ export default function CadastroMovimentacao() {
         </button>
       </form>
     </div>
-  )
+  );
 }
-
