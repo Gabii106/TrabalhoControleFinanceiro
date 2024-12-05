@@ -1,20 +1,63 @@
-import { ArrowUpCircle, ArrowDownCircle, DollarSign, BarChart2 } from 'lucide-react'
+'use client';
+
+import { useEffect, useState } from 'react';
+import { ArrowUpCircle, ArrowDownCircle, DollarSign, BarChart2 } from 'lucide-react';
+import { db } from '../../firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function Home() {
-  // Mock data (replace with actual data fetching logic)
-  const monthSummary = {
-    totalRevenue: 5000,
-    totalExpenses: 3500,
-    fixedExpenses: 2000,
-    variableExpenses: 1500,
-  }
+  const [monthSummary, setMonthSummary] = useState({
+    totalRevenue: 0,
+    totalExpenses: 0,
+    fixedExpenses: 0,
+    variableExpenses: 0,
+  });
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'movimentos'), (snapshot) => {
+      let totalRevenue = 0;
+      let totalExpenses = 0;
+      let fixedExpenses = 0;
+      let variableExpenses = 0;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const value = data.valor || 0;
+
+        switch (data.tipo) {
+          case 'receita':
+            totalRevenue += value;
+            break;
+          case 'despesa_fixa':
+            fixedExpenses += value;
+            totalExpenses += value;
+            break;
+          case 'despesa_variavel':
+            variableExpenses += value;
+            totalExpenses += value;
+            break;
+          default:
+            break;
+        }
+      });
+
+      setMonthSummary({
+        totalRevenue,
+        totalExpenses,
+        fixedExpenses,
+        variableExpenses,
+      });
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const stats = [
     { title: 'Receitas', value: monthSummary.totalRevenue, icon: ArrowUpCircle, color: 'text-green-600' },
     { title: 'Despesas', value: monthSummary.totalExpenses, icon: ArrowDownCircle, color: 'text-red-600' },
     { title: 'Despesas Fixas', value: monthSummary.fixedExpenses, icon: DollarSign, color: 'text-blue-600' },
     { title: 'Despesas Variáveis', value: monthSummary.variableExpenses, icon: BarChart2, color: 'text-yellow-600' },
-  ]
+  ];
 
   return (
     <div>
@@ -27,12 +70,11 @@ export default function Home() {
               <item.icon className={`${item.color} h-8 w-8`} />
             </div>
             <p className={`${item.color} text-2xl font-bold`}>
-              R$ {item.value.toLocaleString('pt-BR')}
+              R$ {item.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }
-
