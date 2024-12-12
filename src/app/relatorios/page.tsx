@@ -106,12 +106,13 @@ export default function Reports() {
   const exportToPDF = () => {
     const doc = new jsPDF();
     autoTable(doc, {
-      head: [['Descrição', 'Tipo', 'Valor', 'Situação']],
-      body: filteredData.map(({ descricao, tipo, valor, situacao }) => [
+      head: [['Descrição', 'Tipo', 'Valor', 'Situação', 'Data']],
+      body: filteredData.map(({ descricao, tipo, valor, situacao, data }) => [
         descricao,
         tipo,
         `R$ ${valor.toFixed(2)}`,
         situacao,
+        dayjs(data).format('DD/MM/YYYY'),
       ]),
     });
     doc.save('relatorio.pdf');
@@ -187,10 +188,11 @@ export default function Reports() {
               <th className="border border-gray-300 p-2">Tipo</th>
               <th className="border border-gray-300 p-2">Valor</th>
               <th className="border border-gray-300 p-2">Situação</th>
+              <th className="border border-gray-300 p-2">Data</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map(({ id, descricao, tipo, valor, situacao }) => (
+            {filteredData.map(({ id, descricao, tipo, valor, situacao, data }) => (
               <tr key={id}>
                 <td className="border border-gray-300 p-2">{descricao}</td>
                 <td className="border border-gray-300 p-2">{tipo}</td>
@@ -198,6 +200,7 @@ export default function Reports() {
                   R$ {valor.toFixed(2)}
                 </td>
                 <td className="border border-gray-300 p-2">{situacao}</td>
+                <td className="border border-gray-300 p-2">{dayjs(data).format('DD/MM/YYYY')}</td>
               </tr>
             ))}
           </tbody>
