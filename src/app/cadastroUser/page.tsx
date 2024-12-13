@@ -109,6 +109,8 @@ export default function Register() {
             Cadastrar
           </button>
         </form>
+
+
       </div>
     </div>
   );

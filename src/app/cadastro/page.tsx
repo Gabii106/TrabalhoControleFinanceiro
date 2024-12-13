@@ -193,6 +193,13 @@ export default function CadastroMovimentacao() {
           Cadastrar Movimentação
         </button>
       </form>
+      <button
+          onClick={() => router.push('/cadastroUser')}
+          className="text-blue-500 hover:underline"
+        >
+          Cadastrar-se
+        </button>
+      
     </div>
   );
 }
