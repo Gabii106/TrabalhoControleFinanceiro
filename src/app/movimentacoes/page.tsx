@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { ArrowUpCircle, ArrowDownCircle, XCircle } from 'lucide-react';
 import { db } from '../../../firebase';
+import { useAuth } from '../hooks/userAuth';
+import { redirect } from 'next/navigation';
 import { collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 
 interface Movimento {
@@ -15,6 +17,15 @@ interface Movimento {
 }
 
 export default function VerMovimentacoes() {
+  const { user, loading } = useAuth();
+
+    // Redireciona se o usuário não estiver logado
+    useEffect(() => {
+      if (!loading && !user) {
+        redirect('/login');
+      }
+    }, [user, loading]);
+
   const [movimentos, setMovimentos] = useState<Movimento[]>([]);
   const [filtro, setFiltro] = useState('todos');
   const [editingTransaction, setEditingTransaction] = useState<Movimento | null>(null);
