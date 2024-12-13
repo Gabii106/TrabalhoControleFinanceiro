@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '../../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { useAuth } from '../hooks/userAuth';
+import { redirect } from 'next/navigation';
 import dayjs from 'dayjs'; // Biblioteca para manipulação de datas
 
 export default function CadastroMovimentacao() {
+  const { user, loading } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState({
     tipo: 'receita',
@@ -16,6 +19,13 @@ export default function CadastroMovimentacao() {
     mesesFixos: '1',
     situacao: 'pago',
   });
+
+    // Redireciona se o usuário não estiver logado
+    useEffect(() => {
+      if (!loading && !user) {
+        redirect('/login');
+      }
+    }, [user, loading]);
 
   // Atualiza os valores do formulário
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

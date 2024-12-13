@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpCircle, ArrowDownCircle, DollarSign, BarChart2 } from 'lucide-react';
 import { db } from '../../firebase';
+import { useAuth } from './hooks/userAuth';
+import { redirect } from 'next/navigation';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function Home() {
+  const { user, loading } = useAuth();
   const [monthSummary, setMonthSummary] = useState({
     totalRevenue: 0,
     totalExpenses: 0,
@@ -51,6 +54,13 @@ export default function Home() {
 
     return () => unsubscribe();
   }, []);
+
+    // Redireciona se o usuário não estiver logado
+    useEffect(() => {
+      if (!loading && !user) {
+        redirect('/login');
+      }
+    }, [user, loading]);
 
   const stats = [
     { title: 'Receitas', value: monthSummary.totalRevenue, icon: ArrowUpCircle, color: 'text-green-600' },

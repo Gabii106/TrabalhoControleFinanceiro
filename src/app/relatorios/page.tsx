@@ -8,6 +8,8 @@ import autoTable from 'jspdf-autotable';
 import { Bar } from 'react-chartjs-2';
 import 'chart.js/auto';
 import dayjs from 'dayjs';
+import { useAuth } from '../hooks/userAuth';
+import { redirect } from 'next/navigation';
 
 // Interface Movimento para tipagem
 interface Movimento {
@@ -29,6 +31,7 @@ interface ChartData {
 }
 
 export default function Reports() {
+  const { user, loading } = useAuth();
   const [transactions, setTransactions] = useState<Movimento[]>([]);
   const [filter, setFilter] = useState({
     type: '',
@@ -59,6 +62,13 @@ export default function Reports() {
 
     return () => unsubscribe();
   }, []);
+
+    // Redireciona se o usuário não estiver logado
+    useEffect(() => {
+      if (!loading && !user) {
+        redirect('/login');
+      }
+    }, [user, loading]);
 
   const filteredData = transactions.filter((transaction) => {
     if (filter.type && transaction.tipo !== filter.type) return false;
