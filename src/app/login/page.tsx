@@ -74,7 +74,12 @@ export default function Login() {
             Entrar
           </button>
         </form>
-
+        <button
+          onClick={() => router.push('/cadastroUser')}
+          className="text-blue-500 hover:underline"
+        >
+        Não possui um perfil. Cadastrar-se
+        </button>
       </div>
     </div>
   );
