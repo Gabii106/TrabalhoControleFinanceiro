@@ -13,6 +13,7 @@ const menuItems = [
   { href: '/cadastro', label: 'Cadastro de Movimentação' },
   { href: '/movimentacoes', label: 'Ver Movimentação' },
   { href: '/relatorios', label: 'Relatórios' },
+  { href: '/perfilUser', label: 'Perfil'},
   { href: '', label: 'Logout' }, // Deixe o href vazio para o botão de logout
 ];
 
